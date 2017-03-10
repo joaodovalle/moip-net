@@ -66,7 +66,7 @@ namespace Moip.Net
 
         private string GetAuthorizationHeader()
         {
-            var base64Key = Convert.ToBase64String(Encoding.Default.GetBytes(string.Format("{0}:{1}", ApiToken, ApiKey)));
+            var base64Key = Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Format("{0}:{1}", ApiToken, ApiKey)));
             return string.Format("Basic {0}", base64Key);
         }
 
