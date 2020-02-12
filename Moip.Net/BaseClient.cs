@@ -1,4 +1,5 @@
-﻿using Moip.Net.Assinaturas;
+﻿using Framework;
+using Moip.Net.Assinaturas;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
@@ -47,9 +48,11 @@ namespace Moip.Net
 
         protected virtual WebRequest CreateRequest(string method, Uri uri)
         {
+            //System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
             WebRequest webRequest = (WebRequest)WebRequest.Create(uri);
             webRequest.Method = method;
-            HttpWebRequest httpRequest = webRequest as HttpWebRequest;
+            HttpWebRequest httpRequest = webRequest as HttpWebRequest; 
             if (httpRequest != null)
             {
                 httpRequest.UserAgent = UserAgent;
@@ -123,12 +126,17 @@ namespace Moip.Net
             }
             catch (WebException wexc)
             {
+                Logger.GetInstance().Error("MOIPNETERROR", wexc);
+
+                
                 var httpResponse = wexc.Response as HttpWebResponse;
                 if (httpResponse != null)
                 {
                     string jsonResult = GetResponseAsString(wexc.Response);
 
-                    if(httpResponse.ContentType.IndexOf("json") < 0 || string.IsNullOrEmpty(jsonResult))
+                    Logger.GetInstance().Error("MOIPNETERROR.RESPONSE=>"+jsonResult);
+
+                    if (httpResponse.ContentType.IndexOf("json") < 0 || string.IsNullOrEmpty(jsonResult))
                     {
                         throw new MoipException(string.Format("Erro ao acessar {0} - {1}", httpResponse.ResponseUri, httpResponse.StatusDescription), httpResponse.StatusCode);
                     }
